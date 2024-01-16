@@ -1,5 +1,3 @@
-console.log('Hi from the Cypress Cloud!!! ⛅')
-
 let isPhoneRequired = false
 
 const phoneLabelSpan = document.querySelector('.phone-label-span')

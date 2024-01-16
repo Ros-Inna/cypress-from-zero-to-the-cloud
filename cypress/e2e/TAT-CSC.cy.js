@@ -1,4 +1,5 @@
-describe('TAT Customer Service Center', () => {
+const THREE_SECONDS_IN_MS = 3000
+describe('TAT Customer S3000ervice Center', () => {
 
   beforeEach(() => {
     cy.visit('./src/index.html')
@@ -9,6 +10,8 @@ describe('TAT Customer Service Center', () => {
   })
 
   it('2.2. Fills in the required fields and submits the form', () => {
+    cy.clock() // freeze the browser clock
+
     const longText = Cypress._.repeat('QWERTYUIOPASDFghjklzxcvbnm', 10)
     cy.get('#firstName').type('Anna')
     cy.get('#lastName').type('Blanco')
@@ -17,6 +20,8 @@ describe('TAT Customer Service Center', () => {
     cy.get('.button[type="submit').click()
 
     cy.get('.success').should('be.visible')
+    cy.tick(THREE_SECONDS_IN_MS) // advances the clock by three seconds (in milliseconds). In doing so, we don't need to keep waiting.
+    cy.get('.success').should('not.be.visible')
   })
 
   it('2.3. Displays an error message when submitting the form with an email with invalid formatting', () => {
@@ -78,10 +83,14 @@ describe('TAT Customer Service Center', () => {
   })
 
   it('2.7. Displays an error message when submitting the form without filling the required fields', () => {
+    cy.clock() // freeze the browser clock
+
     cy.get('#open-text-area').type('Extra exercise 6')
     cy.get('.button[type="submit').click()
 
     cy.get('.error').should('be.visible')
+    cy.tick(THREE_SECONDS_IN_MS) // advances the clock by three seconds (in milliseconds). In doing so, we don't need to keep waiting.
+    cy.get('.error').should('not.be.visible')
   })
 
   it('2.8. Successfully submits the form using a custom command', () => {
@@ -170,6 +179,7 @@ describe('TAT Customer Service Center', () => {
   })
 
   it('5.2. displays an error message when the phone becomes required but is not filled in before the form submission', () => {
+    cy.clock() // freeze the browser clock
     cy.get('#firstName').type('Anna')
     cy.get('#lastName').type('Blanco')
     cy.get('#email').type('anna@test.ca')
@@ -178,6 +188,9 @@ describe('TAT Customer Service Center', () => {
       .should('be.checked')
     cy.get('.button[type="submit').click()
     cy.get('.error').should('be.visible')
+
+    cy.tick(THREE_SECONDS_IN_MS) // advances the clock by three seconds (in milliseconds). In doing so, we don't need to keep waiting.
+    cy.get('.error').should('not.be.visible')
   })
 
   it('6.1. selects a file from the fixtures folder', () => {
@@ -218,9 +231,50 @@ describe('TAT Customer Service Center', () => {
     cy.contains('h1', 'TAT CSC - Privacy Policy').should('be.visible')
   })
 
-  it('11.1.', () => {
-
+  it('12.2. displays and hides the success and error messages using .invoke()', () => {
+    cy.get('.success')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Message successfully sent.')
+      .invoke('hide')
+      .should('not.be.visible')
+    cy.get('.error')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Validate the required fields!')
+      .invoke('hide')
+      .should('not.be.visible')
   })
-  //continue: video 39 or lesson 9
+
+  it('12.3. fills in the text area field using the invoke command', () => {
+    cy.get('#open-text-area').invoke('val', 'Skill level: All Levels\nStudents: 574\nLanguages: English\nCaptions: Yes')
+      .should('have.value', 'Skill level: All Levels\nStudents: 574\nLanguages: English\nCaptions: Yes')
+  })
+
+  it('12.4. makes an HTTP request', () => {
+    cy.request('https://tat-csc.s3.sa-east-1.amazonaws.com/index.html')
+      .as('getRequest')
+      .its('status')
+      .should('be.equal', 200)
+    cy.get('@getRequest')
+      .its('statusText')
+      .should('be.equal', 'OK')
+    cy.get('@getRequest')
+      .its('body')
+      .should('include', 'TAT CSC')
+  })
+
+  it('13.1. finds a hidden 🐈', () => {
+    cy.get('#cat')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', '🐈')
+      .invoke('hide')
+      .should('not.be.visible')
+  })
+  //continue: video 47 or lesson 12
 
 })
