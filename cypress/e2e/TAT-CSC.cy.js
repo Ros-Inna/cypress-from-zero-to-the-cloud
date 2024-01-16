@@ -218,7 +218,7 @@ describe('TAT Customer Service Center', () => {
     cy.contains('h1', 'TAT CSC - Privacy Policy').should('be.visible')
   })
 
-  it('10.1.', () => {
+  it('11.1.', () => {
 
   })
   //continue: video 39 or lesson 9
